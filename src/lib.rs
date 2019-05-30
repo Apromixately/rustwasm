@@ -13,24 +13,31 @@ impl Canvas {
         self.buf.as_ptr()
     }
 
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
     pub fn draw(&mut self) {
-        let size = (self.width * self.height) as usize;
-        for i in 0..size {
-            self.buf[4*i] = (i % 255) as u8; // r
-            self.buf[4*i+1] = 0; // g
-            self.buf[4*i+2] = 0; // b
-            self.buf[4*i+3] = 255; // alpha
+        for row in 0..self.height {
+            for col in 0..self.width {
+                let i = (row * self.width + col) as usize;
+
+                self.buf[4 * i] = 2 * (i % 111) as u8; // r
+                self.buf[4 * i + 1] = 2 * (row % 100) as u8; // g
+                self.buf[4 * i + 2] = 2 * (col % 100) as u8; // b
+                self.buf[4 * i + 3] = 255; // alpha
+            }
         }
     }
 
     pub fn new() -> Canvas {
         let width = 400u32;
         let height = 300u32;
-        let buf = vec![0; (width*height) as usize * 4];
-        Canvas {
-            width,
-            height,
-            buf,
-        }
+        let buf = vec![0; (width * height) as usize * 4];
+        Canvas { width, height, buf }
     }
 }

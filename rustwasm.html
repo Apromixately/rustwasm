@@ -12,20 +12,22 @@
         const memory = thingy.memory;
 
         const rustcanvas = Canvas.new();
-        const w = rustcanvas.width;
-        const h = rustcanvas.height;
+        console.log(rustcanvas);
+        const w = rustcanvas.width();
+        const h = rustcanvas.height();
+        console.log(w + ' ' + h);
 
-        const canvas = document.getElementById("output");
-        canvas.width = w;
-        canvas.height = h;
+        const jscanvas = document.getElementById("output");
+        jscanvas.width = w;
+        jscanvas.height = h;
+        const ctx = jscanvas.getContext('2d');
 
         const memoryPtr = rustcanvas.buf();
         const buf = new Uint8ClampedArray(memory.buffer, memoryPtr, w * h * 4);
-        console.log(buf);
         const img = new ImageData(buf, w, h);
 
         const render = () => {
-            canvas.draw();
+            rustcanvas.draw();
             ctx.putImageData(img, 0, 0)
             requestAnimationFrame(render);
         }
