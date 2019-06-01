@@ -26,9 +26,9 @@ impl Canvas {
             for col in 0..self.width {
                 let i = (row * self.width + col) as usize;
 
-                self.buf[4 * i] = 2 * (i % 111) as u8; // r
-                self.buf[4 * i + 1] = 2 * (row % 100) as u8; // g
-                self.buf[4 * i + 2] = 2 * (col % 100) as u8; // b
+                self.buf[4 * i]     = (row ^ col) as u8; // r
+                self.buf[4 * i + 1] = (128+row ^ col) as u8; // g
+                self.buf[4 * i + 2] = 0 as u8; // b
                 self.buf[4 * i + 3] = 255; // alpha
             }
         }
