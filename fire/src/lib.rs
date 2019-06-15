@@ -12,9 +12,48 @@ pub struct Canvas {
     width: u32,
     height: u32,
     buf: Vec<u8>,
+    intbuf: Vec<u8>,
     t: u32,
     oldt: u32,
 }
+
+const COLORS: [[u8; 3]; 37] = [[  7,   7,   7],
+                               [ 31,   7,   7],
+                               [ 47,  15,   7],
+                               [ 71,  15,   7],
+                               [ 87,  23,   7],
+                               [103,  31,   7],
+                               [119,  31,   7],
+                               [143,  39,   7],
+                               [159,  47,   7],
+                               [175,  63,   7],
+                               [191,  71,   7],
+                               [199,  71,   7],
+                               [223,  79,   7],
+                               [223,  87,   7],
+                               [223,  87,   7],
+                               [215,  95,   7],
+                               [215,  95,   7],
+                               [215, 103,  15],
+                               [207, 111,  15],
+                               [207, 119,  15],
+                               [207, 127,  15],
+                               [207, 135,  23],
+                               [199, 135,  23],
+                               [199, 143,  23],
+                               [199, 151,  31],
+                               [191, 159,  31],
+                               [191, 159,  31],
+                               [191, 167,  39],
+                               [191, 167,  39],
+                               [191, 175,  47],
+                               [183, 175,  47],
+                               [183, 183,  47],
+                               [183, 183,  55],
+                               [207, 207, 111],
+                               [223, 223, 159],
+                               [239, 239, 199],
+                               [255, 255, 255]];
 
 #[wasm_bindgen]
 impl Canvas {
@@ -35,53 +74,50 @@ impl Canvas {
     }
 
     pub fn draw(&mut self) {
-        //if self.t < self.oldt + 1000 {
-        //    return;
-        //}
+        if self.t < self.oldt + 50 {
+            return;
+        }
         self.oldt = self.t;
-        for row in 1..self.height {
-            for col in 5..self.width-5 {
-                let offset: u32 = if js_sys::Math::random() < 0.5 { 1 } else { self.width-1 };
-                let newcol = (col + offset) % self.width;
-
+        for col in 0..self.width {
+            for row in 1..self.height {
                 let i = (row * self.width + col) as usize;
-                let above = ((row-1) * self.width + newcol) as usize;
-
-                let rand = js_sys::Math::random();
-                let step = if rand < 0.03 {
-                    18
-                } else if rand < 0.5 {
-                    3
+                let pixel = self.intbuf[i];
+                if pixel == 0 {
+                    self.intbuf[((row-1) * self.width + col) as usize] = 0;
                 } else {
-                    0
-                };
+                    let r: u32 = js_sys::Math::round(js_sys::Math::random()*4.0) as u32 - 2;
 
-                let oldval = self.buf[4*i];
-                let newval = if oldval > step { oldval - step } else { 0 };
-                self.buf[4 * above + 0] = newval;
-                self.buf[4 * above + 1] = newval;
-                self.buf[4 * above + 2] = newval;
+                    let dstcol = (col + self.width - r) % self.width;
+                    let decrease = if js_sys::Math::random() > 0.5 { 1 } else { 0 };
+                    self.intbuf[((row-1) * self.width + dstcol) as usize] =
+                        if self.intbuf[i] > decrease { self.intbuf[i] - decrease } else { 0 };
+                }
+            }
+        }
+
+        for col in 0..self.width {
+            for row in 0..self.height {
+                let i = (row * self.width + col) as usize;
+                self.buf[i * 4 + 0] = COLORS[self.intbuf[i] as usize][0];
+                self.buf[i * 4 + 1] = COLORS[self.intbuf[i] as usize][1];
+                self.buf[i * 4 + 2] = COLORS[self.intbuf[i] as usize][2];
+                self.buf[i * 4 + 3] = 255;
             }
         }
     }
 
     pub fn new() -> Canvas {
         console_error_panic_hook::set_once();
-        let width = 400u32;
-        let height = 300u32;
+        let width = 128u32;
+        let height = 128u32;
         let mut buf = vec![0; (width * height) as usize * 4];
-        for row in 0..height {
-            for col in 0..width {
-                let i = (row*width + col) as usize;
-                buf[4 * i + 0] = if row == height-1 && col > 125 && col < 275 { 255 } else { 0 };
-                buf[4 * i + 1] = if row == height-1 && col > 125 && col < 275 { 255 } else { 0 };
-                buf[4 * i + 2] = if row == height-1 && col > 125 && col < 275 { 255 } else { 0 };
 
-                buf[4 * i + 3] = 255;
-            }
+        let mut intbuf = vec![0; (width * height) as usize];
+        for col in 30..98 {
+            intbuf[((height-1)*width + col) as usize] = 36;
         }
         let t = 0;
         let oldt = t;
-        Canvas { width, height, buf, t, oldt}
+        Canvas { width, height, buf, intbuf, t, oldt}
     }
 }
