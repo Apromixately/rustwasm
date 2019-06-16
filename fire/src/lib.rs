@@ -88,8 +88,9 @@ impl Canvas {
                     let r: u32 = js_sys::Math::round(js_sys::Math::random()*4.0) as u32 - 2;
 
                     let dstcol = (col + self.width - r) % self.width;
+                    let dst = ((row-1) * self.width + dstcol) as usize;
                     let decrease = if js_sys::Math::random() > 0.5 { 1 } else { 0 };
-                    self.intbuf[((row-1) * self.width + dstcol) as usize] =
+                    self.intbuf[dst] =
                         if self.intbuf[i] > decrease { self.intbuf[i] - decrease } else { 0 };
                 }
             }
@@ -113,7 +114,7 @@ impl Canvas {
         let mut buf = vec![0; (width * height) as usize * 4];
 
         let mut intbuf = vec![0; (width * height) as usize];
-        for col in 30..98 {
+        for col in 0..width {
             intbuf[((height-1)*width + col) as usize] = 36;
         }
         let t = 0;

@@ -18,6 +18,8 @@
         const jscanvas = document.getElementById("output");
         jscanvas.width = w;
         jscanvas.height = h;
+        jscanvas.style.width = 1.5*w;
+        jscanvas.style.height = 1.5*h;
         const ctx = jscanvas.getContext('2d');
 
         const memoryPtr = rustcanvas.buf();
