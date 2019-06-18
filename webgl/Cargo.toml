@@ -4,4 +4,23 @@ version = "0.1.0"
 authors = ["Apromixately <Apromixately@users.noreply.github.com>"]
 edition = "2018"
 
+[lib]
+crate-type = ["cdylib"]
+
 [dependencies]
+wasm-bindgen = "0.2.46"
+js-sys = "0.3.23"
+
+# this just means we have a dependency on web-sys but with extra settings
+[dependencies.web-sys]
+version = "0.3.4"
+features = [
+  'Document',
+  'Element',
+  'HtmlCanvasElement',
+  'WebGlBuffer',
+  'WebGlRenderingContext',
+  'WebGlProgram',
+  'WebGlShader',
+  'Window',
+]

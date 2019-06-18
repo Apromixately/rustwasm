@@ -1,0 +1,17 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <script type="module">
+      import { default as init } from './pkg/webgl.js';
+
+      async function run() {
+        await init('./pkg/webgl_bg.wasm');
+      }
+
+      run();
+    </script>
+  </body>
+</html>
