@@ -1,0 +1,17 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <script type="module">
+            import { greet, default as init } from './pkg/nopack.js';
+
+            async function run() {
+                await init('./pkg/nopack_bg.wasm');
+                greet("World!"); 
+            }
+
+            run();
+        </script>
+    </body>
+</html>
