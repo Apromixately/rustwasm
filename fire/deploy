@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./build
+cp rustwasm.html ~/website/apromixately.github.io/rustwasm3.html
+cp pkg/fire.js pkg/fire_bg.wasm ~/website/apromixately.github.io/pkg/
