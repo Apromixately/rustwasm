@@ -6,7 +6,7 @@ use web_sys::{WebGlProgram, WebGlRenderingContext, WebGlShader};
 #[wasm_bindgen(start)]
 pub fn start() -> Result<(), JsValue> {
     let document = web_sys::window().unwrap().document().unwrap();
-    let canvas = document.get_element_by_id("canvas").unwrap();
+    let canvas = document.get_element_by_id("output").unwrap();
     let canvas: web_sys::HtmlCanvasElement = canvas.dyn_into::<web_sys::HtmlCanvasElement>()?;
 
     let context = canvas
@@ -24,41 +24,67 @@ pub fn start() -> Result<(), JsValue> {
         }
     "#,
     )?;
+
     let frag_shader = compile_shader(
         &context,
         WebGlRenderingContext::FRAGMENT_SHADER,
         r#"
         void main() {
-            gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
         }
     "#,
     )?;
+
     let program = link_program(&context, &vert_shader, &frag_shader)?;
     context.use_program(Some(&program));
+    //                  +y
+    //                   ^
+    //                   |
+    // +----------------------------------+
+    // |                 |                |
+    // |                 |                |
+    // |                 |                |
+    // | -  -  -  -  - (0/0)  -  -  -  -  |  --> +x
+    // |                 |                |
+    // |                 |                |
+    // |                 |                |
+    // +----------------------------------+
 
-    let vertices: [f32; 9] = [-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0];
+    const LOW: f32 = -0.2;
+    const HIGH: f32 = 0.2;
+    let vertices: [f32; 12] = [ LOW,  HIGH, 0.0,
+                                LOW,  LOW,  0.0,
+                                HIGH, HIGH, 0.0,
+                                HIGH, LOW,  0.0];
+
     let memory_buffer = wasm_bindgen::memory()
         .dyn_into::<WebAssembly::Memory>()?
         .buffer();
+
     let vertices_location = vertices.as_ptr() as u32 / 4;
+
     let vert_array = js_sys::Float32Array::new(&memory_buffer)
         .subarray(vertices_location, vertices_location + vertices.len() as u32);
 
     let buffer = context.create_buffer().ok_or("failed to create buffer")?;
+
     context.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
+
     context.buffer_data_with_array_buffer_view(
         WebGlRenderingContext::ARRAY_BUFFER,
         &vert_array,
         WebGlRenderingContext::STATIC_DRAW,
     );
+
     context.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
     context.enable_vertex_attrib_array(0);
 
-    context.clear_color(0.0, 0.0, 0.0, 1.0);
+    // clear background
+    context.clear_color(0.0, 0.0, 0.5, 1.0);
     context.clear(WebGlRenderingContext::COLOR_BUFFER_BIT);
 
     context.draw_arrays(
-        WebGlRenderingContext::TRIANGLES,
+        WebGlRenderingContext::TRIANGLE_STRIP,
         0,
         (vertices.len() / 3) as i32,
     );
