@@ -10,6 +10,7 @@ crate-type = ["cdylib"]
 [dependencies]
 wasm-bindgen = "0.2.46"
 js-sys = "0.3.23"
+nalgebra = "0.18.0"
 
 # this just means we have a dependency on web-sys but with extra settings
 [dependencies.web-sys]
@@ -22,5 +23,6 @@ features = [
   'WebGlRenderingContext',
   'WebGlProgram',
   'WebGlShader',
+  'WebGlUniformLocation',
   'Window',
 ]
