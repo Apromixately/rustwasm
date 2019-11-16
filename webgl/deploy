@@ -1,0 +1,6 @@
+#!/bin/sh
+
+./build
+#cp rustwasm.html ~/website/apromixately.github.io/rustwasm_square.html
+cp pkg/webgl.js ~/website/apromixately.github.io/pkg/square.js
+cp pkg/webgl_bg.wasm ~/website/apromixately.github.io/pkg/square_bg.wasm
