@@ -1,0 +1,39 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <canvas id="output"></canvas>
+    <script type="module">
+      import { Canvas, default as init } from './pkg/banana.js';
+
+      async function run() {
+        const thingy = await init('./pkg/banana_bg.wasm');
+        const memory = thingy.memory;
+
+        const rustcanvas = Canvas.new();
+        console.log(rustcanvas);
+        const w = rustcanvas.width();
+        const h = rustcanvas.height();
+        console.log(w + ' ' + h);
+
+        const jscanvas = document.getElementById("output");
+        jscanvas.width = w;
+        jscanvas.height = h;
+        const ctx = jscanvas.getContext('2d');
+
+        const memoryPtr = rustcanvas.buf();
+        const buf = new Uint8ClampedArray(memory.buffer, memoryPtr, w * h * 4);
+        const img = new ImageData(buf, w, h);
+
+        const render = () => {
+            rustcanvas.draw();
+            ctx.putImageData(img, 0, 0)
+        }
+        render();
+      }
+
+      run();
+    </script>
+  </body>
+</html>
